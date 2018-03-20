@@ -1,16 +1,29 @@
 class Application
+
+  @@items = ["Apples","Carrots","Pears"]
+
   def call(env)
-      resp = Rack::Response.new
-      # resp.write "Hello, World"
+    resp = Rack::Response.new
+    req = Rack::Request.new(env)
 
-      t = Time.now
-      hour = t.hour
-
-      if hour < 12
-        resp.write 'Good Morning!'
-      else
-        resp.write 'Good Afternoon!'
+    if req.path.match(/items/)
+      @@items.each do |item|
+        resp.write "#{item}\n"
       end
-      resp.finish
+    elsif req.path.match(/search/)
+
+      search_term = req.params["q"]
+
+      if @@items.include?(search_term)
+        resp.write "#{search_term} is one of our items"
+      else
+        resp.write "Couldn't find #{search_term}"
+      end
+
+    else
+      resp.write "Path Not Found"
     end
+
+    resp.finish
+  end
 end
